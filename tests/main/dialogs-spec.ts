@@ -1,21 +1,21 @@
 /**
- * @jest-environment node
+ * @vitest-environment node
  */
 
 import { dialog } from 'electron';
-import * as fs from 'fs-extra';
-import { mocked } from 'jest-mock';
+import fs from 'fs-extra';
+import { vi } from 'vitest';
 
 import { IpcEvents } from '../../src/ipc-events';
 import { setupDialogs } from '../../src/main/dialogs';
 import { ipcMainManager } from '../../src/main/ipc';
 
-jest.mock('fs-extra');
-jest.mock('../../src/main/windows');
+vi.mock('fs-extra');
+vi.mock('../../src/main/windows');
 
 describe('dialogs', () => {
   beforeEach(() => {
-    ipcMainManager.handle = jest.fn();
+    ipcMainManager.handle = vi.fn();
     setupDialogs();
   });
 
@@ -44,9 +44,12 @@ describe('dialogs', () => {
 
     beforeAll(() => {
       // Manually invoke handler to simulate IPC event
-      const call = mocked(ipcMainManager.handle).mock.calls.find(
-        ([channelName]) => channelName === IpcEvents.LOAD_LOCAL_VERSION_FOLDER,
-      );
+      const call = vi
+        .mocked(ipcMainManager.handle)
+        .mock.calls.find(
+          ([channelName]) =>
+            channelName === IpcEvents.LOAD_LOCAL_VERSION_FOLDER,
+        );
       if (call?.length && call.length > 1) {
         const rawIpcHandler = call[1];
         ipcHandler = async () =>
@@ -57,7 +60,7 @@ describe('dialogs', () => {
     });
 
     it('shows dialog when triggering IPC event', async () => {
-      mocked(dialog.showOpenDialog).mockResolvedValue({
+      vi.mocked(dialog.showOpenDialog).mockResolvedValue({
         filePaths: [],
         canceled: true,
       });
@@ -73,8 +76,8 @@ describe('dialogs', () => {
     it('returns a SelectedLocalVersion for the path', () => {
       const paths = ['/test/path/'];
 
-      mocked(fs.existsSync).mockReturnValue(false);
-      mocked(dialog.showOpenDialog).mockResolvedValue({
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      vi.mocked(dialog.showOpenDialog).mockResolvedValue({
         filePaths: paths,
         canceled: false,
       });
@@ -88,14 +91,14 @@ describe('dialogs', () => {
 
     it('returns nothing if not given a path', async () => {
       // empty array
-      mocked(dialog.showOpenDialog).mockResolvedValue({
+      vi.mocked(dialog.showOpenDialog).mockResolvedValue({
         filePaths: [],
         canceled: true,
       });
       expect(ipcHandler()).resolves.toBe(undefined);
 
       // nothing in response
-      mocked(dialog.showOpenDialog).mockResolvedValue({} as any);
+      vi.mocked(dialog.showOpenDialog).mockResolvedValue({} as any);
       expect(ipcHandler()).resolves.toBe(undefined);
     });
   });

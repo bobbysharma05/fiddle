@@ -2,9 +2,9 @@ import * as path from 'node:path';
 
 import { Response, fetch } from 'cross-fetch';
 import { app } from 'electron';
-import * as fs from 'fs-extra';
-import { mocked } from 'jest-mock';
+import fs from 'fs-extra';
 import * as tmp from 'tmp';
+import { vi } from 'vitest';
 
 let fakeUserData: tmp.DirResult | null;
 
@@ -12,13 +12,13 @@ import { EditorValues, MAIN_JS } from '../../src/interfaces';
 import { getTemplate, getTestTemplate } from '../../src/main/content';
 import { isReleasedMajor } from '../../src/main/versions';
 
-jest.mock('cross-fetch');
-jest.unmock('fs-extra');
-jest.mock('../../src/main/constants', () => ({
+vi.mock('cross-fetch');
+vi.unmock('fs-extra');
+vi.mock('../../src/main/constants', () => ({
   STATIC_DIR: path.join(__dirname, '../../static'),
 }));
-jest.mock('../../src/main/versions', () => ({
-  isReleasedMajor: jest.fn(),
+vi.mock('../../src/main/versions', () => ({
+  isReleasedMajor: vi.fn(),
 }));
 
 let lastResponse = new Response(null, {
@@ -56,7 +56,7 @@ describe('content', () => {
   const VERSION_NOT_IN_FIXTURES = '10.0.0';
 
   beforeAll(() => {
-    mocked(app.getPath).mockImplementation((name: string) => {
+    vi.mocked(app.getPath).mockImplementation((name: string) => {
       if (name === 'userData') {
         // set it to be a newly-allocated tmpdir
         if (!fakeUserData) {
@@ -81,11 +81,11 @@ describe('content', () => {
 
   describe('getTestTemplate()', () => {
     beforeEach(() => {
-      mocked(fetch).mockImplementation(fetchFromFilesystem);
+      vi.mocked(fetch).mockImplementation(fetchFromFilesystem);
     });
 
     afterEach(() => {
-      mocked(fetch).mockClear();
+      vi.mocked(fetch).mockClear();
     });
 
     it('loads a test template', async () => {
@@ -99,10 +99,10 @@ describe('content', () => {
 
   describe('getTemplate()', () => {
     beforeEach(() => {
-      mocked(fetch).mockImplementation(fetchFromFilesystem);
+      vi.mocked(fetch).mockImplementation(fetchFromFilesystem);
     });
     afterEach(() => {
-      mocked(fetch).mockClear();
+      vi.mocked(fetch).mockClear();
     });
 
     it('returns the same promise if the work is already pending', async () => {
@@ -146,7 +146,7 @@ describe('content', () => {
     });
 
     it('returns the same promise if the work is already pending', async () => {
-      mocked(isReleasedMajor).mockReturnValue(true);
+      vi.mocked(isReleasedMajor).mockReturnValue(true);
       const version = VERSION_IN_FIXTURES;
       const a = getTemplate(version);
       const b = getTemplate(version);

@@ -21,18 +21,18 @@ describe('Dialogs component', () => {
   it('renders the token dialog', () => {
     store.isTokenDialogShowing = true;
     const wrapper = shallow(<Dialogs appState={store} />);
-    expect(wrapper.text()).toBe('<TokenDialog /><GenericDialog />');
+    expect(wrapper.text()).toBe('<TokenDialog2 /><GenericDialog2 />');
   });
 
   it('renders the settings dialog', () => {
     store.isSettingsShowing = true;
     const wrapper = shallow(<Dialogs appState={store} />);
-    expect(wrapper.text()).toBe('<Settings /><GenericDialog />');
+    expect(wrapper.text()).toBe('<Settings2 /><GenericDialog2 />');
   });
 
   it('renders the add version dialog', () => {
     store.isAddVersionDialogShowing = true;
     const wrapper = shallow(<Dialogs appState={store} />);
-    expect(wrapper.text()).toBe('<AddVersionDialog /><GenericDialog />');
+    expect(wrapper.text()).toBe('<AddVersionDialog2 /><GenericDialog2 />');
   });
 });

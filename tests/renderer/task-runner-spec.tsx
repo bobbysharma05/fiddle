@@ -1,4 +1,4 @@
-import { mocked } from 'jest-mock';
+import { vi } from 'vitest';
 
 import {
   BisectRequest,
@@ -41,7 +41,7 @@ describe('Task Runner component', () => {
   async function requestAndWait(event: FiddleEvent, req: any) {
     emitEvent(event, req);
     await waitFor(
-      () => mocked(window.ElectronFiddle.taskDone).mock.calls.length > 0,
+      () => vi.mocked(window.ElectronFiddle.taskDone).mock.calls.length > 0,
     );
   }
 

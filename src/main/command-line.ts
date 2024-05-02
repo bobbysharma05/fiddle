@@ -1,7 +1,7 @@
 import * as os from 'node:os';
 
 import * as commander from 'commander';
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 import getos from 'getos';
 
 import { openFiddle } from './files';

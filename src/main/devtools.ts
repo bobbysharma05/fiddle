@@ -9,10 +9,9 @@ import { isDevMode } from './utils/devmode';
 export async function setupDevTools(): Promise<void> {
   if (!isDevMode()) return;
 
-  const {
-    default: installExtension,
-    REACT_DEVELOPER_TOOLS,
-  } = require('electron-devtools-installer');
+  const { default: installExtension, REACT_DEVELOPER_TOOLS } = await import(
+    'electron-devtools-installer'
+  );
 
   try {
     const react = await installExtension(REACT_DEVELOPER_TOOLS, {

@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { shallow } from 'enzyme';
 import * as MonacoType from 'monaco-editor';
+import { vi } from 'vitest';
 
 import { Output } from '../../../src/renderer/components/output';
 import { AppState } from '../../../src/renderer/state';
@@ -9,12 +10,12 @@ import { MonacoMock } from '../../mocks/mocks';
 
 const mockContext = {
   mosaicActions: {
-    expand: jest.fn(),
-    remove: jest.fn(),
-    hide: jest.fn(),
-    replaceWith: jest.fn(),
-    updateTree: jest.fn(),
-    getRoot: jest.fn(),
+    expand: vi.fn(),
+    remove: vi.fn(),
+    hide: vi.fn(),
+    replaceWith: vi.fn(),
+    updateTree: vi.fn(),
+    getRoot: vi.fn(),
   },
   mosaicId: 'output',
 };
@@ -87,7 +88,7 @@ describe('Output component', () => {
     );
     const instance: any = wrapper.instance();
 
-    // Todo: There's a scary bug here in Jest / Enzyme. At this point in time,
+    // Todo: There's a scary bug here in vi / Enzyme. At this point in time,
     // the context is {}. That's never the case in production.
     // direction is required to be recognized as a valid root node
     mockContext.mosaicActions.getRoot.mockReturnValue({
@@ -148,7 +149,7 @@ describe('Output component', () => {
     );
 
     const instance: any = wrapper.instance();
-    const spy = jest.spyOn(instance, 'updateModel');
+    const spy = vi.spyOn(instance, 'updateModel');
 
     instance.outputRef.current = 'ref';
     await instance.initMonaco();
@@ -176,7 +177,7 @@ describe('Output component', () => {
       <Output appState={store} monaco={monaco} monacoOptions={{}} />,
     );
     const instance: any = wrapper.instance();
-    const spy = jest.spyOn(instance, 'toggleConsole');
+    const spy = vi.spyOn(instance, 'toggleConsole');
 
     instance.outputRef.current = 'ref';
     await instance.initMonaco();

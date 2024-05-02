@@ -1,6 +1,8 @@
+import { vi } from 'vitest';
+
 export class ElectronTypesMock {
-  public setVersion = jest.fn();
-  public uncache = jest.fn();
+  public setVersion = vi.fn();
+  public uncache = vi.fn();
 }
 
 export interface NodeTypesMock {

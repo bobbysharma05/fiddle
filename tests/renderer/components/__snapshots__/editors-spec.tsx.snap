@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Editors component renders 1`] = `
+exports[`Editors component > renders 1`] = `
 <div
   className="focused__undefined mosaic mosaic-drop-target"
 >
@@ -881,75 +881,6 @@ exports[`Editors component renders 1`] = `
     />
     <div
       className="drop-target right"
-    />
-  </div>
-</div>
-`;
-
-exports[`Editors component renders a toolbar 1`] = `
-<div>
-  <div>
-    <h5>
-      main.js
-    </h5>
-  </div>
-  <div />
-  <div
-    className="mosaic-controls"
-  >
-    <MaximizeButton
-      appState={
-        {
-          "editorMosaic": {
-            "layoutDebounce": 26,
-            "mosaic": {
-              "direction": "row",
-              "first": {
-                "direction": "column",
-                "first": "main.js",
-                "second": "renderer.js",
-              },
-              "second": {
-                "direction": "column",
-                "first": "index.html",
-                "second": {
-                  "direction": "column",
-                  "first": "preload.js",
-                  "second": "styles.css",
-                },
-              },
-            },
-          },
-        }
-      }
-      id="main.js"
-    />
-    <RemoveButton
-      appState={
-        {
-          "editorMosaic": {
-            "layoutDebounce": 26,
-            "mosaic": {
-              "direction": "row",
-              "first": {
-                "direction": "column",
-                "first": "main.js",
-                "second": "renderer.js",
-              },
-              "second": {
-                "direction": "column",
-                "first": "index.html",
-                "second": {
-                  "direction": "column",
-                  "first": "preload.js",
-                  "second": "styles.css",
-                },
-              },
-            },
-          },
-        }
-      }
-      id="main.js"
     />
   </div>
 </div>

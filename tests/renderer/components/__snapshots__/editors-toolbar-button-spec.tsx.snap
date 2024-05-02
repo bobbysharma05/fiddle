@@ -1,12 +1,12 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Editor toolbar button component MaximizeButton renders 1`] = `
+exports[`Editor toolbar button component > MaximizeButton > renders 1`] = `
 <Component>
   <Component />
 </Component>
 `;
 
-exports[`Editor toolbar button component RemoveButton renders 1`] = `
+exports[`Editor toolbar button component > RemoveButton > renders 1`] = `
 <Component>
   <Component />
 </Component>

@@ -1,5 +1,5 @@
-import { mocked } from 'jest-mock';
 import * as semver from 'semver';
+import { vi } from 'vitest';
 
 import {
   InstallState,
@@ -17,7 +17,7 @@ import {
 } from '../mocks/mocks';
 import { emitEvent, waitFor } from '../utils';
 
-jest.mock('../../src/renderer/file-manager');
+vi.mock('../../src/renderer/file-manager');
 
 describe('Runner component', () => {
   let store: StateMock;
@@ -33,17 +33,17 @@ describe('Runner component', () => {
     store.getName.mockResolvedValue('test-app-name');
     store.modules = new Map<string, string>([['cow', '*']]);
 
-    mocked(
+    vi.mocked(
       window.ElectronFiddle.getIsPackageManagerInstalled,
     ).mockResolvedValue(true);
-    mocked(window.ElectronFiddle.deleteUserData).mockResolvedValue();
+    vi.mocked(window.ElectronFiddle.deleteUserData).mockResolvedValue();
 
     instance = new Runner(store as unknown as AppState);
   });
 
   describe('buildChildEnvVars', () => {
     it('fails when the environment variable is invalid', () => {
-      store.showErrorDialog = jest.fn().mockResolvedValueOnce(true);
+      store.showErrorDialog = vi.fn().mockResolvedValueOnce(true);
       store.environmentVariables = ['bwap bwap'];
       const env = instance.buildChildEnvVars();
       expect(env).toEqual({});
@@ -167,7 +167,7 @@ describe('Runner component', () => {
     });
 
     it('shows a dialog and returns invalid when the current version is missing', async () => {
-      store.showErrorDialog = jest.fn().mockResolvedValueOnce(true);
+      store.showErrorDialog = vi.fn().mockResolvedValueOnce(true);
       store.currentElectronVersion = {
         version: 'test-0',
         localPath: '/i/definitely/do/not/exist',
@@ -176,7 +176,7 @@ describe('Runner component', () => {
       } as const;
 
       const err = `Local Electron build missing for version ${store.currentElectronVersion.version} - please verify it is in the correct location or remove and re-add it.`;
-      store.isVersionUsable = jest.fn().mockReturnValueOnce({ err });
+      store.isVersionUsable = vi.fn().mockReturnValueOnce({ err });
 
       const result = await instance.run();
       expect(result).toBe(RunResult.INVALID);
@@ -215,7 +215,7 @@ describe('Runner component', () => {
       const result = await instance.run();
 
       expect(result).toBe(RunResult.SUCCESS);
-      await process.nextTick;
+      await new Promise(process.nextTick);
       expect(window.ElectronFiddle.cleanupDirectory).toHaveBeenCalledTimes(1);
       expect(window.ElectronFiddle.deleteUserData).toHaveBeenCalledTimes(1);
       expect(window.ElectronFiddle.deleteUserData).toHaveBeenCalledWith(
@@ -230,7 +230,7 @@ describe('Runner component', () => {
       const result = await instance.run();
 
       expect(result).toBe(RunResult.SUCCESS);
-      await process.nextTick;
+      await new Promise(process.nextTick);
       expect(window.ElectronFiddle.cleanupDirectory).toHaveBeenCalledTimes(1);
     });
 
@@ -250,16 +250,16 @@ describe('Runner component', () => {
     });
 
     it('does not run if writing files fails', async () => {
-      mocked(fileManager.saveToTemp).mockRejectedValueOnce('bwap bwap');
+      vi.mocked(fileManager.saveToTemp).mockRejectedValueOnce('bwap bwap');
 
       expect(await instance.run()).toBe(RunResult.INVALID);
     });
 
     it('does not run if installing modules fails', async () => {
       const oldError = console.error;
-      console.error = jest.fn();
+      console.error = vi.fn();
 
-      instance.installModules = jest.fn().mockImplementationOnce(async () => {
+      instance.installModules = vi.fn().mockImplementationOnce(async () => {
         throw new Error('Bwap-bwap');
       });
 
@@ -271,7 +271,7 @@ describe('Runner component', () => {
 
   describe('stop()', () => {
     it('stops a running session', async () => {
-      mocked(window.ElectronFiddle.stopFiddle).mockImplementationOnce(() => {
+      vi.mocked(window.ElectronFiddle.stopFiddle).mockImplementationOnce(() => {
         emitEvent('fiddle-stopped', RunResult.FAILURE);
       });
 
@@ -289,7 +289,7 @@ describe('Runner component', () => {
     });
 
     it('fails if stopping fiddle fails', async () => {
-      mocked(window.ElectronFiddle.stopFiddle).mockImplementationOnce(() => {});
+      vi.mocked(window.ElectronFiddle.stopFiddle).mockReset();
 
       // wait for run() to get running
       instance.run();
@@ -309,8 +309,8 @@ describe('Runner component', () => {
       expect(mockVersions[LAST_GOOD]).toEqual(expect.anything());
       expect(mockVersions[FIRST_BAD]).toEqual(expect.anything());
 
-      const spy = jest.spyOn(store, 'setVersion');
-      instance.run = jest.fn().mockImplementation(() => {
+      const spy = vi.spyOn(store, 'setVersion');
+      instance.run = vi.fn().mockImplementation(() => {
         // test succeeds iff version <= LAST_GOOD
         if (typeof store.version !== 'string') {
           throw new Error(
@@ -337,8 +337,8 @@ describe('Runner component', () => {
     });
 
     it('returns invalid if unable to run', async () => {
-      const spy = jest.spyOn(store, 'setVersion');
-      instance.run = jest.fn().mockImplementation(() => RunResult.INVALID);
+      const spy = vi.spyOn(store, 'setVersion');
+      instance.run = vi.fn().mockImplementation(() => RunResult.INVALID);
 
       const bisectRange = [...mockVersionsArray].reverse();
       const result = await instance.autobisect(bisectRange);
@@ -363,7 +363,7 @@ describe('Runner component', () => {
     });
 
     async function allRunsReturn(runResult: RunResult) {
-      instance.run = jest.fn().mockImplementation(() => runResult);
+      instance.run = vi.fn().mockImplementation(() => runResult);
       const bisectRange = [...mockVersionsArray].reverse();
 
       const bisectResult = await instance.autobisect(bisectRange);
@@ -392,7 +392,7 @@ describe('Runner component', () => {
     });
 
     it('handles an error', async () => {
-      mocked(window.ElectronFiddle.addModules).mockRejectedValueOnce(
+      vi.mocked(window.ElectronFiddle.addModules).mockRejectedValueOnce(
         'bwap bwap',
       );
 
@@ -405,7 +405,7 @@ describe('Runner component', () => {
 
   describe('performForgeOperation()', () => {
     it('runs in response to an event', () => {
-      instance.performForgeOperation = jest.fn();
+      instance.performForgeOperation = vi.fn();
       emitEvent('package-fiddle');
       expect(instance.performForgeOperation).toHaveBeenCalledTimes(1);
 
@@ -426,7 +426,7 @@ describe('Runner component', () => {
     });
 
     it('handles an error in saveToTemp()', async () => {
-      instance.saveToTemp = jest.fn();
+      instance.saveToTemp = vi.fn();
 
       expect(await instance.performForgeOperation(ForgeCommands.MAKE)).toBe(
         false,
@@ -434,7 +434,7 @@ describe('Runner component', () => {
     });
 
     it('handles an error in packageInstall()', async () => {
-      mocked(window.ElectronFiddle.addModules).mockRejectedValueOnce(
+      vi.mocked(window.ElectronFiddle.addModules).mockRejectedValueOnce(
         'bwap bwap',
       );
 
@@ -444,7 +444,7 @@ describe('Runner component', () => {
     });
 
     it('handles an error in packageRun()', async () => {
-      mocked(window.ElectronFiddle.packageRun).mockRejectedValueOnce(
+      vi.mocked(window.ElectronFiddle.packageRun).mockRejectedValueOnce(
         'bwap bwap',
       );
 
@@ -454,7 +454,7 @@ describe('Runner component', () => {
     });
 
     it('does attempt a forge operation if npm is not installed', async () => {
-      mocked(
+      vi.mocked(
         window.ElectronFiddle.getIsPackageManagerInstalled,
       ).mockResolvedValueOnce(false);
 
@@ -469,7 +469,7 @@ describe('Runner component', () => {
       ['does not attempt installation if npm is not installed', false, 0],
       ['does attempt installation if npm is installed', true, 1],
     ])('%s', async (_: unknown, haveNpm: boolean, numCalls: number) => {
-      mocked(
+      vi.mocked(
         window.ElectronFiddle.getIsPackageManagerInstalled,
       ).mockResolvedValue(haveNpm);
       await instance.installModules({

@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { shallow } from 'enzyme';
+import { vi } from 'vitest';
 
 import {
   EditorValues,
@@ -91,7 +92,7 @@ describe('SidebarFileTree component', () => {
     const EDITOR_NAME = 'index.html';
     const EDITOR_NEW_NAME = 'new_index.html';
 
-    store.showInputDialog = jest.fn().mockResolvedValueOnce(EDITOR_NEW_NAME);
+    store.showInputDialog = vi.fn().mockResolvedValueOnce(EDITOR_NEW_NAME);
 
     expect(editorMosaic.files.get(EDITOR_NAME)).toBe(EditorPresence.Pending);
 
@@ -110,8 +111,8 @@ describe('SidebarFileTree component', () => {
     const EDITOR_NAME = 'index.html';
     const EDITOR_NEW_NAME = PACKAGE_NAME;
 
-    store.showInputDialog = jest.fn().mockResolvedValueOnce(EDITOR_NEW_NAME);
-    store.showErrorDialog = jest.fn().mockResolvedValueOnce(true);
+    store.showInputDialog = vi.fn().mockResolvedValueOnce(EDITOR_NEW_NAME);
+    store.showErrorDialog = vi.fn().mockResolvedValueOnce(true);
 
     await instance.renameEditor(EDITOR_NAME);
 
@@ -128,8 +129,8 @@ describe('SidebarFileTree component', () => {
     const EDITOR_NAME = 'index.html';
     const EDITOR_NEW_NAME = 'data.txt';
 
-    store.showInputDialog = jest.fn().mockResolvedValueOnce(EDITOR_NEW_NAME);
-    store.showErrorDialog = jest.fn().mockResolvedValueOnce(true);
+    store.showInputDialog = vi.fn().mockResolvedValueOnce(EDITOR_NEW_NAME);
+    store.showErrorDialog = vi.fn().mockResolvedValueOnce(true);
 
     await instance.renameEditor(EDITOR_NAME);
 
@@ -147,8 +148,8 @@ describe('SidebarFileTree component', () => {
     const TO_BE_NAMED = 'index.html';
     const EDITOR_NEW_NAME = EXISTED_NAME;
 
-    store.showInputDialog = jest.fn().mockResolvedValueOnce(EDITOR_NEW_NAME);
-    store.showErrorDialog = jest.fn().mockResolvedValueOnce(true);
+    store.showInputDialog = vi.fn().mockResolvedValueOnce(EDITOR_NEW_NAME);
+    store.showErrorDialog = vi.fn().mockResolvedValueOnce(true);
 
     await instance.renameEditor(TO_BE_NAMED);
 
@@ -165,8 +166,8 @@ describe('SidebarFileTree component', () => {
     const TO_BE_NAMED = 'index.html';
     const EDITOR_NEW_NAME = MAIN_CJS;
 
-    store.showInputDialog = jest.fn().mockResolvedValueOnce(EDITOR_NEW_NAME);
-    store.showErrorDialog = jest.fn().mockResolvedValueOnce(true);
+    store.showInputDialog = vi.fn().mockResolvedValueOnce(EDITOR_NEW_NAME);
+    store.showErrorDialog = vi.fn().mockResolvedValueOnce(true);
 
     await instance.renameEditor(TO_BE_NAMED);
 
@@ -180,7 +181,7 @@ describe('SidebarFileTree component', () => {
     const wrapper = shallow(<SidebarFileTree appState={store} />);
     const instance: any = wrapper.instance();
 
-    editorMosaic.resetLayout = jest.fn();
+    editorMosaic.resetLayout = vi.fn();
 
     instance.resetLayout();
 
@@ -200,7 +201,7 @@ describe('SidebarFileTree component', () => {
     setTimeout(() => {
       expect(editorMosaic.files.get('index.html')).toBe(EditorPresence.Visible);
       expect(editorsInstance.state.focused).toBe('index.html');
-    });
+    }, 1000);
   });
 
   it('file is hidden, click files tree, make file visible and focus file content', function () {
@@ -220,6 +221,6 @@ describe('SidebarFileTree component', () => {
     setTimeout(() => {
       expect(editorMosaic.files.get('index.html')).toBe(EditorPresence.Visible);
       expect(editorsInstance.state.focused).toBe('index.html');
-    });
+    }, 1000);
   });
 });

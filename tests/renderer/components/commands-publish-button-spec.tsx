@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Octokit } from '@octokit/rest';
 import { shallow } from 'enzyme';
-import { mocked } from 'jest-mock';
+import { vi } from 'vitest';
 
 import {
   EditorValues,
@@ -16,21 +16,21 @@ import { AppState } from '../../../src/renderer/state';
 import { getOctokit } from '../../../src/renderer/utils/octokit';
 import { createEditorValues } from '../../mocks/mocks';
 
-jest.mock('../../../src/renderer/utils/octokit');
+vi.mock('../../../src/renderer/utils/octokit');
 
 class OctokitMock {
   private static nextId = 1;
 
-  public authenticate = jest.fn();
+  public authenticate = vi.fn();
   public gists = {
-    create: jest.fn().mockImplementation(() => ({
+    create: vi.fn().mockImplementation(() => ({
       data: {
         id: OctokitMock.nextId++,
       },
     })),
-    delete: jest.fn(),
-    update: jest.fn(),
-    get: jest.fn(),
+    delete: vi.fn(),
+    update: vi.fn(),
+    get: vi.fn(),
   };
 }
 
@@ -65,7 +65,7 @@ describe('Action button component', () => {
 
     // have the octokit getter use our mock
     mocktokit = new OctokitMock();
-    mocked(getOctokit).mockImplementation(
+    vi.mocked(getOctokit).mockImplementation(
       async () => mocktokit as unknown as Octokit,
     );
 
@@ -74,7 +74,7 @@ describe('Action button component', () => {
     const files = getGistFiles(editorValues);
     expectedGistOpts = { description, files, public: true } as const;
 
-    mocked(window.ElectronFiddle.getTemplate).mockResolvedValue({
+    vi.mocked(window.ElectronFiddle.getTemplate).mockResolvedValue({
       [MAIN_JS]: '// content',
     });
   });
@@ -92,7 +92,7 @@ describe('Action button component', () => {
 
   it('registers for "save-fiddle-gist" events', () => {
     // confirm that it starts listening when mounted
-    const listenSpy = jest.spyOn(window.ElectronFiddle, 'addEventListener');
+    const listenSpy = vi.spyOn(window.ElectronFiddle, 'addEventListener');
     const { instance, wrapper } = createActionButton();
     expect(listenSpy).toHaveBeenCalledWith(
       'save-fiddle-gist',
@@ -101,7 +101,7 @@ describe('Action button component', () => {
     listenSpy.mockRestore();
 
     // confirm that it stops listening when unmounted
-    const removeListenerSpy = jest.spyOn(
+    const removeListenerSpy = vi.spyOn(
       window.ElectronFiddle,
       'removeAllListeners',
     );
@@ -111,16 +111,16 @@ describe('Action button component', () => {
   });
 
   it('toggles the auth dialog on click if not authed', async () => {
-    state.toggleAuthDialog = jest.fn();
+    state.toggleAuthDialog = vi.fn();
     const { instance } = createActionButton();
     await instance.handleClick();
     expect(state.toggleAuthDialog).toHaveBeenCalled();
   });
 
   it('toggles the publish method on click only after authing if not authed', async () => {
-    state.toggleAuthDialog = jest.fn();
+    state.toggleAuthDialog = vi.fn();
     const { instance } = createActionButton();
-    instance.performGistAction = jest.fn();
+    instance.performGistAction = vi.fn();
 
     // If not authed, don't continue to performGistAction
     await instance.handleClick();
@@ -128,7 +128,7 @@ describe('Action button component', () => {
     expect(instance.performGistAction).not.toHaveBeenCalled();
 
     // If authed, continue to performGistAction
-    mocked(state.toggleAuthDialog).mockImplementationOnce(
+    vi.mocked(state.toggleAuthDialog).mockImplementationOnce(
       () => (state.gitHubToken = 'github-token'),
     );
     await instance.handleClick();
@@ -140,7 +140,7 @@ describe('Action button component', () => {
     state.gitHubToken = 'github-token';
 
     const { instance } = createActionButton();
-    instance.performGistAction = jest.fn();
+    instance.performGistAction = vi.fn();
     await instance.handleClick();
 
     expect(instance.performGistAction).toHaveBeenCalled();
@@ -156,14 +156,14 @@ describe('Action button component', () => {
     });
 
     it('publishes a gist', async () => {
-      state.showInputDialog = jest.fn().mockResolvedValueOnce(description);
+      state.showInputDialog = vi.fn().mockResolvedValueOnce(description);
       await instance.performGistAction();
       expect(mocktokit.gists.create).toHaveBeenCalledWith(expectedGistOpts);
     });
 
     it('resets editorMosaic.isEdited state', async () => {
       state.editorMosaic.isEdited = true;
-      state.showInputDialog = jest.fn().mockResolvedValueOnce(description);
+      state.showInputDialog = vi.fn().mockResolvedValueOnce(description);
       await instance.performGistAction();
       expect(mocktokit.gists.create).toHaveBeenCalledWith(expectedGistOpts);
       expect(state.editorMosaic.isEdited).toBe(false);
@@ -171,7 +171,7 @@ describe('Action button component', () => {
 
     it('asks the user for a description', async () => {
       const description = 'some non-default description';
-      state.showInputDialog = jest.fn().mockResolvedValueOnce(description);
+      state.showInputDialog = vi.fn().mockResolvedValueOnce(description);
       await instance.performGistAction();
       expect(mocktokit.gists.create).toHaveBeenCalledWith({
         ...expectedGistOpts,
@@ -180,7 +180,7 @@ describe('Action button component', () => {
     });
 
     it('publishes only if the user confirms', async () => {
-      state.showInputDialog = jest.fn().mockResolvedValueOnce(undefined);
+      state.showInputDialog = vi.fn().mockResolvedValueOnce(undefined);
       await instance.performGistAction();
       expect(mocktokit.gists.create).not.toHaveBeenCalled();
     });
@@ -189,9 +189,9 @@ describe('Action button component', () => {
       it('are replaced with default content for required files', async () => {
         const values = { [MAIN_JS]: '' } as const;
 
-        mocked(app.getEditorValues).mockResolvedValueOnce(values);
+        vi.mocked(app.getEditorValues).mockResolvedValueOnce(values);
         const { instance } = createActionButton();
-        state.showInputDialog = jest.fn().mockResolvedValueOnce(description);
+        state.showInputDialog = vi.fn().mockResolvedValueOnce(description);
         await instance.performGistAction();
 
         const files = getGistFiles(values);
@@ -203,12 +203,12 @@ describe('Action button component', () => {
         const required = { [MAIN_JS]: '// fnord' };
         const optional = { 'foo.js': '' };
 
-        mocked(app.getEditorValues).mockResolvedValueOnce({
+        vi.mocked(app.getEditorValues).mockResolvedValueOnce({
           ...required,
           ...optional,
         });
         const { instance } = createActionButton();
-        state.showInputDialog = jest.fn().mockResolvedValueOnce(description);
+        state.showInputDialog = vi.fn().mockResolvedValueOnce(description);
         await instance.performGistAction();
 
         const files = getGistFiles(required);
@@ -218,10 +218,10 @@ describe('Action button component', () => {
 
       it('calls update() if isPublishingGistAsRevision is true', async () => {
         state.isPublishingGistAsRevision = true;
-        state.showInputDialog = jest.fn().mockResolvedValueOnce(description);
+        state.showInputDialog = vi.fn().mockResolvedValueOnce(description);
 
         const { instance } = createActionButton();
-        const spy = jest.spyOn(instance, 'handleUpdate');
+        const spy = vi.spyOn(instance, 'handleUpdate');
 
         await instance.performGistAction();
         expect(spy).toHaveBeenCalledWith(true);
@@ -234,7 +234,7 @@ describe('Action button component', () => {
       });
 
       state.editorMosaic.isEdited = true;
-      state.showInputDialog = jest.fn().mockResolvedValueOnce(description);
+      state.showInputDialog = vi.fn().mockResolvedValueOnce(description);
 
       const { instance } = createActionButton();
       await instance.performGistAction();
@@ -245,7 +245,7 @@ describe('Action button component', () => {
     });
 
     it('can publish private gists', async () => {
-      state.showInputDialog = jest.fn().mockResolvedValueOnce(description);
+      state.showInputDialog = vi.fn().mockResolvedValueOnce(description);
       instance.setPrivate();
       await instance.performGistAction();
       const { create } = mocktokit.gists;
@@ -256,7 +256,7 @@ describe('Action button component', () => {
     });
 
     it('can publish public gists', async () => {
-      state.showInputDialog = jest.fn().mockResolvedValueOnce(description);
+      state.showInputDialog = vi.fn().mockResolvedValueOnce(description);
       instance.setPublic();
       await instance.performGistAction();
       const { create } = mocktokit.gists;

@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { shallow } from 'enzyme';
+import { vi } from 'vitest';
 
 import { EditorId, MAIN_JS } from '../../../src/interfaces';
 import { Editor } from '../../../src/renderer/components/editor';
@@ -17,7 +18,7 @@ describe('Editor component', () => {
     ({ state: store } = window.app);
   });
 
-  function createEditor(id: EditorId, didMount: DidMount = jest.fn()) {
+  function createEditor(id: EditorId, didMount: DidMount = vi.fn()) {
     const wrapper = shallow(
       <Editor
         appState={store}
@@ -58,9 +59,9 @@ describe('Editor component', () => {
       const id = MAIN_JS;
       const { editorMosaic } = store;
       editorMosaic.set({ [id]: '// content' });
-      const addEditorSpy = jest.spyOn(editorMosaic, 'addEditor');
+      const addEditorSpy = vi.spyOn(editorMosaic, 'addEditor');
 
-      const didMount = jest.fn();
+      const didMount = vi.fn();
       const { instance } = createEditor(id, didMount);
 
       instance.containerRef.current = 'ref';
@@ -84,7 +85,7 @@ describe('Editor component', () => {
   it('componentWillUnmount() attempts to dispose the editor', async () => {
     const id = MAIN_JS;
     store.editorMosaic.set({ [id]: '// content' });
-    const didMount = jest.fn();
+    const didMount = vi.fn();
     const { instance } = createEditor(id, didMount);
 
     instance.containerRef.current = 'ref';
@@ -97,7 +98,7 @@ describe('Editor component', () => {
   it('focus editor file', async () => {
     const id = MAIN_JS;
     store.editorMosaic.set({ [id]: '// content' });
-    const didMount = jest.fn();
+    const didMount = vi.fn();
     const { instance } = createEditor(id, didMount);
 
     instance.containerRef.current = 'ref';

@@ -1,4 +1,5 @@
 import { mount } from 'enzyme';
+import { vi } from 'vitest';
 
 import { renderNonIdealState } from '../../../src/renderer/components/editors-non-ideal-state';
 import { EditorMosaic } from '../../../src/renderer/editor-mosaic';
@@ -15,7 +16,7 @@ describe('renderNonIdealState()', () => {
   });
 
   it('handles a click', () => {
-    const resetLayoutSpy = jest.spyOn(editorMosaic, 'resetLayout');
+    const resetLayoutSpy = vi.spyOn(editorMosaic, 'resetLayout');
     const wrapper = mount(renderNonIdealState(editorMosaic));
     wrapper.find('button').simulate('click');
     expect(resetLayoutSpy).toHaveBeenCalledTimes(1);

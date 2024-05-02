@@ -1,5 +1,6 @@
-import { mocked } from 'jest-mock';
 import { toJS } from 'mobx';
+import { vi } from 'vitest';
+import type { Mock } from 'vitest';
 
 import { FiddleEvent } from '../src/interfaces';
 
@@ -61,9 +62,9 @@ export function resetRendererArch() {
 }
 
 export function mockFetchOnce(text: string) {
-  mocked(window.fetch).mockResolvedValueOnce({
-    text: jest.fn().mockResolvedValue(text),
-    json: jest.fn().mockImplementation(async () => JSON.parse(text)),
+  vi.mocked(window.fetch).mockResolvedValueOnce({
+    text: vi.fn().mockResolvedValue(text),
+    json: vi.fn().mockImplementation(async () => JSON.parse(text)),
   } as unknown as Response);
 }
 
@@ -73,7 +74,7 @@ export class FetchMock {
     this.urls.set(url, content);
   }
   constructor() {
-    window.fetch = jest.fn().mockImplementation(async (url: string) => {
+    window.fetch = vi.fn().mockImplementation(async (url: string) => {
       const content = this.urls.get(url);
       if (!content) {
         console.trace('Unhandled mock URL:', url);
@@ -82,8 +83,8 @@ export class FetchMock {
         };
       }
       return {
-        text: jest.fn().mockResolvedValue(content),
-        json: jest.fn().mockImplementation(async () => JSON.parse(content)),
+        text: vi.fn().mockResolvedValue(content),
+        json: vi.fn().mockImplementation(async () => JSON.parse(content)),
         ok: true,
       };
     });
@@ -139,7 +140,7 @@ export async function waitFor(
 }
 
 export function emitEvent(type: FiddleEvent, ...args: any[]) {
-  (window.ElectronFiddle.addEventListener as jest.Mock).mock.calls.forEach(
+  (window.ElectronFiddle.addEventListener as Mock).mock.calls.forEach(
     (call) => {
       if (call[0] === type) {
         call[1](...args);

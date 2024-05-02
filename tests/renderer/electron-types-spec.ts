@@ -1,4 +1,4 @@
-import { mocked } from 'jest-mock';
+import { vi } from 'vitest';
 
 import {
   InstallState,
@@ -12,18 +12,18 @@ import { emitEvent, waitFor } from '../utils';
 
 describe('ElectronTypes', () => {
   const version = '10.11.12';
-  let addExtraLib: ReturnType<typeof jest.fn>;
+  let addExtraLib: ReturnType<typeof vi.fn>;
   let localVersion: RunnableVersion;
   let monaco: MonacoMock;
   let remoteVersion: RunnableVersion;
   let electronTypes: ElectronTypes;
   let nodeTypesData: NodeTypesMock[];
-  let disposable: { dispose: typeof jest.fn };
+  let disposable: { dispose: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     monaco = new MonacoMock();
     ({ addExtraLib } = monaco.languages.typescript.javascriptDefaults);
-    disposable = { dispose: jest.fn() };
+    disposable = { dispose: vi.fn() };
     addExtraLib.mockReturnValue(disposable);
 
     remoteVersion = {
@@ -57,7 +57,9 @@ describe('ElectronTypes', () => {
 
     it('gives types to monaco', async () => {
       const types = 'some types';
-      mocked(window.ElectronFiddle.getElectronTypes).mockResolvedValue(types);
+      vi.mocked(window.ElectronFiddle.getElectronTypes).mockResolvedValue(
+        types,
+      );
       await electronTypes.setVersion(localVersion);
       expect(addExtraLib).toHaveBeenCalledWith(types);
     });
@@ -65,7 +67,9 @@ describe('ElectronTypes', () => {
     it('disposes the previous monaco content', async () => {
       // setup: call setVersion once to get some content into monaco
       const types = 'some types';
-      mocked(window.ElectronFiddle.getElectronTypes).mockResolvedValue(types);
+      vi.mocked(window.ElectronFiddle.getElectronTypes).mockResolvedValue(
+        types,
+      );
       await electronTypes.setVersion(localVersion);
       expect(addExtraLib).toHaveBeenCalledWith(types);
       expect(disposable.dispose).not.toHaveBeenCalled();
@@ -77,7 +81,7 @@ describe('ElectronTypes', () => {
 
     it('watches for the types file to be updated', async () => {
       const oldTypes = 'some types';
-      mocked(window.ElectronFiddle.getElectronTypes).mockResolvedValue(
+      vi.mocked(window.ElectronFiddle.getElectronTypes).mockResolvedValue(
         oldTypes,
       );
       await electronTypes.setVersion(localVersion);
@@ -95,7 +99,9 @@ describe('ElectronTypes', () => {
     it('stops watching old types files when the version changes', async () => {
       // set to version A
       const types = 'some types';
-      mocked(window.ElectronFiddle.getElectronTypes).mockResolvedValue(types);
+      vi.mocked(window.ElectronFiddle.getElectronTypes).mockResolvedValue(
+        types,
+      );
       await electronTypes.setVersion(localVersion);
       expect(addExtraLib).toHaveBeenCalledWith(types);
 
@@ -121,14 +127,16 @@ describe('ElectronTypes', () => {
 
   describe('setVersion({ source: remote })', () => {
     beforeEach(() => {
-      addExtraLib.mockReturnValue({ dispose: jest.fn() });
+      addExtraLib.mockReturnValue({ dispose: vi.fn() });
     });
 
     it('gets types', async () => {
       const version = { ...remoteVersion, version: '15.0.0-nightly.20210628' };
       const types = 'here are the types';
-      mocked(window.ElectronFiddle.getElectronTypes).mockResolvedValue(types);
-      mocked(window.ElectronFiddle.getNodeTypes).mockResolvedValue({
+      vi.mocked(window.ElectronFiddle.getElectronTypes).mockResolvedValue(
+        types,
+      );
+      vi.mocked(window.ElectronFiddle.getNodeTypes).mockResolvedValue({
         version: version.version,
         types: nodeTypesData
           .flatMap((entry) => (entry.files ? entry.files : entry))
@@ -149,7 +157,9 @@ describe('ElectronTypes', () => {
     });
 
     it('does not crash if types are not found', async () => {
-      mocked(window.ElectronFiddle.getNodeTypes).mockResolvedValue(undefined);
+      vi.mocked(window.ElectronFiddle.getNodeTypes).mockResolvedValue(
+        undefined,
+      );
       await electronTypes.setVersion(remoteVersion);
       expect(window.ElectronFiddle.getNodeTypes).toHaveBeenCalledTimes(1);
       expect(addExtraLib).not.toHaveBeenCalled();

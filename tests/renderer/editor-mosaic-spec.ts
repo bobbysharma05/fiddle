@@ -1,5 +1,5 @@
-import { mocked } from 'jest-mock';
 import { reaction } from 'mobx';
+import { vi } from 'vitest';
 
 import { EditorId, EditorValues, MAIN_JS } from '../../src/interfaces';
 import {
@@ -83,7 +83,7 @@ describe('EditorMosaic', () => {
       // setup: put visible file into the mosaic and then hide it.
       // this should cause EditorMosaic to cache the viewstate offscreen.
       const viewState = Symbol('some unique viewstate');
-      mocked(editor.saveViewState).mockReturnValueOnce(viewState as any);
+      vi.mocked(editor.saveViewState).mockReturnValueOnce(viewState as any);
       editorMosaic.addEditor(id, editor);
       editorMosaic.hide(id);
       expect(editorMosaic.files.get(id)).toBe(EditorPresence.Hidden);
@@ -448,7 +448,7 @@ describe('EditorMosaic', () => {
       const id = MAIN_JS;
       editorMosaic.set(valuesIn);
       editorMosaic.addEditor(id, editor);
-      mocked(editor.hasTextFocus).mockReturnValue(true);
+      vi.mocked(editor.hasTextFocus).mockReturnValue(true);
 
       expect(editorMosaic.focusedEditor()).toBe(editor);
     });
@@ -471,7 +471,7 @@ describe('EditorMosaic', () => {
       editorMosaic.layout();
       editorMosaic.layout();
       editorMosaic.layout();
-      await waitFor(() => mocked(editor.layout).mock.calls.length > 0);
+      await waitFor(() => vi.mocked(editor.layout).mock.calls.length > 0);
 
       expect(editor.layout).toHaveBeenCalledTimes(1);
     });
@@ -479,7 +479,7 @@ describe('EditorMosaic', () => {
 
   describe('disposeLayoutAutorun()', () => {
     it('automatically updates the layout when the mosaic arrangement changes', () => {
-      const spy = jest.spyOn(editorMosaic, 'layout');
+      const spy = vi.spyOn(editorMosaic, 'layout');
       editorMosaic.mosaic = MAIN_JS;
       expect(spy).toHaveBeenCalledTimes(1);
       spy.mockRestore();

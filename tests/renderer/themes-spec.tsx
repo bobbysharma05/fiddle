@@ -1,4 +1,4 @@
-import { mocked } from 'jest-mock';
+import { vi } from 'vitest';
 
 import { activateTheme, getTheme } from '../../src/renderer/themes';
 import { LoadedFiddleTheme } from '../../src/themes-defaults';
@@ -30,7 +30,7 @@ describe('themes', () => {
     });
 
     it('returns a named theme', async () => {
-      mocked(window.ElectronFiddle.readThemeFile).mockResolvedValue({
+      vi.mocked(window.ElectronFiddle.readThemeFile).mockResolvedValue({
         name: 'Test',
         common: { test: true },
       } as unknown as LoadedFiddleTheme);
@@ -40,7 +40,7 @@ describe('themes', () => {
     });
 
     it('handles a read error', async () => {
-      mocked(window.ElectronFiddle.readThemeFile).mockResolvedValue(null);
+      vi.mocked(window.ElectronFiddle.readThemeFile).mockResolvedValue(null);
 
       const theme = await getTheme('test');
       expect(theme.name).toBe('Fiddle (Dark)');

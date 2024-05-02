@@ -2,7 +2,7 @@ import * as path from 'node:path';
 
 import fetch from 'cross-fetch';
 import { IpcMainEvent, app } from 'electron';
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 
 import { STATIC_DIR } from './constants';
 import { ipcMainManager } from './ipc';
